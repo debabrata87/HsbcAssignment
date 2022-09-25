@@ -51,3 +51,5 @@ HSBC Multi currency Payment application with command line interface
   java -jar HsbcAssignment-0.0.1-SNAPSHOT.jar
   
 # Known Issues:
+	Once the Screen is not fed with Input ,Console takes multiple enter /new line character after the next value to accept the input again and resume.
+	This happens every time when input is not provided
