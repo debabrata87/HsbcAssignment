@@ -37,6 +37,8 @@ HSBC Multi currency Payment application with command line interface
 # Data Setup and Confiuration :
 
   1- data.sql file on resource folder contains currency and the initial balance along with exchange rate  [ as in 22/09/2022 corresponding to USD ] which will be displayed as initial balance
+  
+  2- Interval of balance display is configuration in the application property [ balance.displayFrrquency.in.milliseconds=60000]
 
 # Build:
 
@@ -52,4 +54,4 @@ HSBC Multi currency Payment application with command line interface
   
 # Known Issues:
 	Once the Screen is not fed with Input ,Console takes multiple enter /new line character after the next value to accept the input again and resume.
-	This happens every time when input is not provided
+	This happens every time when input is not provided. It is fixed now in the 2nd commit with better Console Messages
