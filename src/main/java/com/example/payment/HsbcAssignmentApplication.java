@@ -24,7 +24,7 @@ public class HsbcAssignmentApplication {
 			
 			
 			
-			if(ps.isT()){
+			if(ps.isShutdown()){
 				//ctx.close();
 				//System.exit(1);
 				//int exitCode=SpringApplication.exit(ctx, ()->0);
@@ -40,8 +40,8 @@ public class HsbcAssignmentApplication {
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.out.println("Fatal Error : System Shutdown");
+
 				}
 			}
 		}

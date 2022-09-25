@@ -1,25 +1,30 @@
 package com.example.payment;
 
 
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+
 
 import com.example.payment.model.ConsoleInput;
 
 
 public class ConsoleReaderThread extends Thread {
 
-	Scanner s;
+	//Scanner s;
+	
+	BufferedReader reader;
+	
 	ConsoleInput cs;
 	
 	private volatile boolean alive = true;
 	
 	
-	public Scanner getS() {
-		return s;
+	public BufferedReader getReader() {
+		return reader;
 	}
 
-	public void setS(Scanner s) {
-		this.s = s;
+	public void setReader(BufferedReader reader) {
+		this.reader = reader;
 	}
 
 	public ConsoleInput getCs() {
@@ -30,30 +35,25 @@ public class ConsoleReaderThread extends Thread {
 		this.cs = cs;
 	}
 
-	public ConsoleReaderThread(Scanner s,ConsoleInput cs) {
-		this.s=s;
+	public ConsoleReaderThread(BufferedReader s,ConsoleInput cs) {
+		this.reader=s;
 		this.cs=cs;
 	}
 	
 	public ConsoleReaderThread() {
-		this.s=null;
+		this.reader=null;
 		this.cs=null;
 	}
 	public void terminate() {
 		
-		System.out.println("\n Thread: Terminate ");
-		
-		
-        this.alive = false;
-        
-        
-        
+		//System.out.println("Thread Terminate ");
+		this.alive = false;
+           
     }
 	
 	public void run() {
 		
-		s = new Scanner(System.in); 
-        
+		
 		while(alive) {
 		      cs.setConsoleInput(null);
 		      //PaymentService.currencyAndPayment=null;
@@ -67,7 +67,11 @@ public class ConsoleReaderThread extends Thread {
 	          //s = new Scanner(System.in).useDelimiter("\n"); 
 	         
 	          //s = new Scanner(System.in);
-	          input=s.nextLine();
+	          try {
+				input=reader.readLine();
+			} catch (IOException e) {
+				
+			}
 	        
 	       
 	          
@@ -76,7 +80,7 @@ public class ConsoleReaderThread extends Thread {
 	           
 	          //String input=s.nextLine();
 			
-	          System.out.print("\n Enter  :"+(input!=null?input : "default ") );
+	          System.out.println("User Entered : "+(input!=null?input : "default ") );
 	          
 	          
 	          if (input == null || input.equals("")) {

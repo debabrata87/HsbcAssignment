@@ -1,16 +1,14 @@
 package com.example.payment.service;
 
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Scanner;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
 import com.example.payment.ConsoleReaderThread;
 import com.example.payment.model.Balance;
 import com.example.payment.model.ConsoleInput;
@@ -20,7 +18,6 @@ import com.example.payment.repository.BalanceRepo;
 @EnableScheduling
 public class PaymentService {
 
-	
 	@Autowired
 	BalanceRepo repo;
 	
@@ -30,38 +27,42 @@ public class PaymentService {
 	//@Value("${balance.displayFrrquency.in.milliseconds}") 
 	//String displayFrrquency;
 	
-	boolean t=false;
+	boolean shutdown=false;
 	
 	
-	static boolean on = true;	
-	//static StringBuffer currencyAndPayment;
 	String inputConsole=null;
 	
-	Scanner buf = null;
+	//Scanner buf = null;
+	BufferedReader buf=null;
 	
-	public boolean isT() {
-		return t;
+	public PaymentService() {
+		
+		System.out.println("PaymentService Instantiated");
+		buf= new BufferedReader(new InputStreamReader(System.in));
+		
+	}
+	
+	public boolean isShutdown() {
+		return shutdown;
 	}
 
 
 
-	public void setT(boolean t) {
-		this.t = t;
+	public void setShutdown(boolean t) {
+		
+		this.shutdown = t;
+		try {
+			buf.close();
+		} catch (IOException e) {
+			System.out.println("Reader closed...."+e);
+		}
 	}
 
 
-
-	//@Scheduled(fixedDelay = 30000)
-	
 	@Scheduled(fixedDelayString = "${balance.displayFrrquency.in.milliseconds}")
 	public void display() {
 		
-		
-		on=true;
-		
-		//System.out.println("Balance...."+usd);
-		
-		//System.out.println("Refresh Rate ...."+displayFrrquency);
+
 			
 		System.out.println("----------------Balance---------------------------------------");
 		repo.findAll().forEach((e) -> {
@@ -74,7 +75,6 @@ public class PaymentService {
 		System.out.println("----------------Balance---------------------------------------");
 		
 		
-		buf= new Scanner(System.in).useDelimiter("\n");
 		   
 		ConsoleReaderThread t=new ConsoleReaderThread(buf,cs);
 		t.setName("console");
@@ -88,28 +88,15 @@ public class PaymentService {
 				Thread.sleep(2000L);
 				
 			} catch (InterruptedException e1) {
-				System.out.println(" \n Closing Terminal \n ");
+				System.out.println("---------Closing Terminal--------");
 		}
 	    
-		   
-		    
-		//Scanner scanner = new Scanner(System.in).useDelimiter("\n");;
-
-	    
-	    //System.out.print("Enter quit to stop or your Currency and Payment :");
-
-	    // get their input as a String
-	    //String currencyAndPayment = scanner.next();
-
-	    //System.out.println(" \n Selection Entered  : " +(currencyAndPayment==null ?" No Input ": currencyAndPayment));
-		System.out.println(" \n Selection Entered  : " +(cs.getConsoleInput()==null ?" No Input ": cs.getConsoleInput()));
+		System.out.println("Selection Entered  : " +(cs.getConsoleInput()==null ?" No Input ": cs.getConsoleInput()));
 	    
 		
 		
 	    if(cs.getConsoleInput()==null) {
-	    	t.getS().hasNext();
-		    System.out.println(" \n No Input ");
-		    
+	    	 
 	    	return;
 	    	
 	    }
@@ -117,20 +104,19 @@ public class PaymentService {
 	    	
 	    	System.out.println("--------------------Thank you for Banking with HSBC--------------------");
 
-	    	this.setT(true);
-	    	
+	    	this.setShutdown(true);
 	    	
 	    }
 	    else {
-	    	 		System.out.println(" \n Processing  Payment  : " +(cs.getConsoleInput()==null ?" No Input ": cs.getConsoleInput()));
+	    	 		System.out.println("Processing Payment :" +(cs.getConsoleInput()==null ?" No Input ": cs.getConsoleInput()));
 	    	 		
 	 	    	    String currency =null;
 				    String amount = null;
-				    if(cs.getConsoleInput()!=null && !cs.getConsoleInput().equals("")) {
+				    if(cs.getConsoleInput()!=null && !new String(cs.getConsoleInput()).equals("")) {
 				    	 currency =new String(cs.getConsoleInput()).trim().split(" ",-1)[0];
 				    	 amount =new String(cs.getConsoleInput()).trim().split(" ",-1)[1];
 				    	 
-				    	 if( (currency==null  || currency.trim().equals("")) || (amount==null  || amount.trim().equals("")) ) {
+				    	 if( (currency==null  || currency.trim().equals("")) || (amount==null  || amount.trim().equals("")) || !isNumeric(amount)) {
 				    		 
 				    		 System.out.println(" \n Invalid Input  : " +(currency==null ?" No Input ": currency) +" Payment Amount : "+amount  );
 					 	     System.out.println(" \n --------------Try Again ------------------------" );
@@ -143,8 +129,17 @@ public class PaymentService {
 				 	    
 				 	    if(list!=null && !list.isEmpty()) {
 				 	    	Balance b=list.get(0);
-				 	    	b.setBalance(b.getBalance()-Double.parseDouble(amount));
-				 	    	repo.save(b);
+				 	    	if(b.getBalance()-Double.parseDouble(amount) >= 0) {
+				 	    		b.setBalance(b.getBalance()-Double.parseDouble(amount));
+				 	    		repo.save(b);
+				 	    	}
+				 	    	else {
+				 	    		System.out.println("\n Credit Balance Insufficient   : " +(currency==null ?" No Input ": currency) +" Balance : "+ b.getBalance() + " Payment : " +amount);
+					 	    	System.out.println("\n --------------Try Again ------------------------" );
+				    	 		
+				 	    		
+				 	    	}
+				 	    	
 				 	    	
 				 	    }
 				 	    else {
@@ -172,6 +167,20 @@ public class PaymentService {
 	    
 	    
 	    
+	}
+	
+	
+	public boolean isNumeric(String amount) {
+		try {
+			Double.parseDouble(amount);
+			//System.out.println("Amount " + amount);
+
+			return true;
+		} catch (NumberFormatException e) {
+			System.out.println("Amount non numeric " + amount);
+
+			return false;
+		}
 	}
 	
 }
