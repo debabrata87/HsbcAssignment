@@ -3,8 +3,8 @@ HSBC Multi currency Payment application with command line interface
 
 # High Level Requirement :
 
-  Command Line Interface to display Multi Currency Balance and Accept Payment and display Balance After processing Payment
-  Programmes continue to run Untill user input "quit"
+  Command Line Interface to display Multi Currency Balance and Accept Payment and display remaining balance after processing Payment.
+  Programmes continue to run and display balance untill user input "quit" 
 
 # GIT URL 
   
